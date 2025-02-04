@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Proveedores</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h2>Registro de Proveedores</h2>
+    <form id="proveedorForm">
+        <label for="ruc">RUC:</label>
+        <input type="text" id="ruc" required><br>
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" required><br>
+
+        <label for="cedula">Cédula:</label>
+        <input type="text" id="cedula" required><br>
+
+        <label for="abonos">Abonos:</label>
+        <input type="number" id="abonos" step="0.01" required><br>
+
+        <button type="submit">Registrar</button>
+    </form>
+    
+    <h3>Lista de Proveedores</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Abonos</th>
+                <th>QR</th>
+            </tr>
+        </thead>
+        <tbody id="proveedorTable">
+        </tbody>
+    </table>
+    
+    <script>
+        document.getElementById("proveedorForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const ruc = document.getElementById("ruc").value;
+            const nombre = document.getElementById("nombre").value;
+            const cedula = document.getElementById("cedula").value;
+            const abonos = document.getElementById("abonos").value;
+
+            axios.post("https://your-backend-url.com/api/proveedores", {
+                ruc,
+                nombre,
+                cedula,
+                abonos
+            }).then(response => {
+                alert("Proveedor registrado exitosamente");
+                document.getElementById("proveedorForm").reset();
+                loadProveedores();
+            }).catch(error => {
+                alert("Error al registrar el proveedor");
+            });
+        });
+
+        function loadProveedores() {
+            axios.get("https://your-backend-url.com/api/proveedores").then(response => {
+                const tbody = document.getElementById("proveedorTable");
+                tbody.innerHTML = "";
+                response.data.forEach(proveedor => {
+                    const row = `<tr>
+                        <td>${proveedor.id}</td>
+                        <td>${proveedor.ruc}</td>
+                        <td>${proveedor.nombre}</td>
+                        <td>${proveedor.cedula}</td>
+                        <td>${proveedor.abonos}</td>
+                        <td><img src="${proveedor.qr_code}" width="100"></td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            });
+        }
+        
+        setInterval(loadProveedores, 5000); // Recargar lista cada 5 segundos
+        loadProveedores();
+    </script>
+</body>
+</html>
